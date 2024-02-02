@@ -19,12 +19,30 @@ namespace Functions
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
 
-            var response = req.CreateResponse(HttpStatusCode.OK);
-            response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
+            var query = System.Web.HttpUtility.ParseQueryString(req.Url.Query);
 
-            response.WriteString("Welcome to Azure Functions!");
+            if (!int.TryParse(query.Get("number1"), out int number1))
+            {
+                var response = req.CreateResponse(HttpStatusCode.BadRequest);
+                response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
+                response.WriteString("Please provide a valid number1");
+                return response;
+            }
+    
+            if (!int.TryParse(query.Get("number2"), out int number2))
+            {
+                var response = req.CreateResponse(HttpStatusCode.BadRequest);
+                response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
+                response.WriteString("Please provide a valid number2");
+                return response;
+            }
 
-            return response;
-        }
-    }
+            var sum = number1 + number2;
+
+            var okResponse = req.CreateResponse(HttpStatusCode.OK);
+            okResponse.Headers.Add("Content-Type", "text/plain; charset=utf-8");
+            okResponse.WriteString($"The sum of {number1} and {number2} is {sum}.");
+
+            return okResponse;
+        }    }
 }
